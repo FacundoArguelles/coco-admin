@@ -33,7 +33,7 @@ class Window(QWidget):
 		layout.addWidget(button,1,7)
 
 		but_stats = QPushButton("Estadisticas")
-		but_stats.clicked.connect(self.show_stats)
+		#but_stats.clicked.connect(self.show_stats)
 		layout.addWidget(but_stats,4,0)
 
 		#LINEEDIT
@@ -73,49 +73,38 @@ class Window(QWidget):
 		#TABLE
 		self.tabla = QTableWidget()
 		self.tabla.setColumnCount(5)
+		self.tabla.setRowCount(1)
 		self.tabla.setShowGrid(True)
 		self.tabla.setHorizontalHeaderLabels(('Marca','Plataforma','Cantidad','Valor','Fecha'))
 		layout.addWidget(self.tabla,2,0,1,8)
+		with open('datos.csv', mode='r') as csv_file:
+			datareader = csv.reader(csv_file)
+			for index, row in enumerate(datareader):
+				rr = self.tabla.rowCount() + 1
+				self.tabla.setRowCount(rr)
+				for index2, el in enumerate(row):
+					#print(index,index2)
+					self.tabla.setItem(index,index2,QTableWidgetItem(el))
+				
 
 	#FUNCION ESTADISTICAS
-	def show_stats(self):
-		with open('datos.csv', mode='r') as csv_file:
-			datareader = csv.reader(csv_file)
-			for row in datareader:
-				for el in row:
-					
-
-	#FUNCION CREAR TABLA
-	# def create_table(self):
-	# 	tabla = QTableWidget()
-	# 	tabla.setColumnCount(5)
-	# 	tabla.setShowGrid(True)
-	# 	tabla.setHorizontalHeaderLabels(('Marca','Plataforma','Cantidad','Valor','Fecha'))
-	# 	layout.addWidget(tabla,2,0)
+	# def show_stats(self):
 	# 	with open('datos.csv', mode='r') as csv_file:
 	# 		datareader = csv.reader(csv_file)
-	# 		count_row = 0
-	# 		count_el = 0
 	# 		for row in datareader:
 	# 			for el in row:
-	# 				self.tabla.setItem(count_row,count_el,QTableWidgetItem(el))
-	# 				count_el += 1
-	# 			count_row += 1
-	# 			count_el = 0
+	
 
 	#FUNCION LEER
-	def leer(self):
+	def actualizar(self):
 		with open('datos.csv', mode='r') as csv_file:
 			datareader = csv.reader(csv_file)
-			count_row = 0
-			count_el = 0
-			for row in datareader:
-				for el in row:
-					print(count_row,count_el,el)
-					self.tabla.setItem(count_row,count_el,QTableWidgetItem(el))
-					count_el += 1
-				count_row += 1
-				count_el = 0
+			for index, row in enumerate(datareader):
+				rr = self.tabla.rowCount() + 1
+				self.tabla.setRowCount(rr)
+				for index2, el in enumerate(row):
+					#print(index,index2)
+					self.tabla.setItem(index,index2,QTableWidgetItem(el))
 
 	#FUNCION CREAR
 	def create(self):
@@ -141,7 +130,7 @@ class Window(QWidget):
 		self.mes1.clear()
 		self.anio.clear()
 
-		self.leer()
+		self.actualizar()
 
 		
 	

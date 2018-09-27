@@ -12,7 +12,7 @@ class Window(QWidget):
 		QWidget.__init__(self)
 		self.setWindowTitle("CocoAdmin")
 		self.setMinimumWidth(600)
-		# self.setMaximumWidth(600)
+		#self.setMaximumWidth(600)
 		self.setMinimumHeight(600)
 		#self.setMaximumHeight(600)
 
@@ -79,6 +79,8 @@ class Window(QWidget):
 		# calendar.setMaximumDate(date(2020,12,31))
 		# layout.addWidget(calendar,1,4)
 
+		# LA TABLA DEJA UN RENGLON EN BLANCO POR CADA FILA CREADA
+
 		#TABLE
 		self.tabla = QTableWidget()
 		self.tabla.setColumnCount(5)
@@ -95,8 +97,9 @@ class Window(QWidget):
 					self.tabla.setItem(index,index2,QTableWidgetItem(el))
 
 
-	#FUNCION ESTADISTICAS
+	
 	def show_stats(self):
+		"""crea y muestra estadisticas"""
 		marcas = []
 		plataforma = []
 		cantidad = []
@@ -114,6 +117,7 @@ class Window(QWidget):
 		p = {}
 	
 		#CORREGIR QUE TOMA COMO DIFERENTES NOMBRES EN UP Y LOWCASE
+		#SACAR ENUMERATE() YA QUE NO USO EL INDEX
 
 		for idx, el in enumerate(marcas):
 			el_ = el.lower() 
@@ -127,6 +131,8 @@ class Window(QWidget):
 
 		print(m)
 		print(p)
+
+		# CORREGIR: NAME LAYOUT IS NOT DEFINED
 
 		for key, value in m.items():
 			t = 5
@@ -161,8 +167,9 @@ class Window(QWidget):
 
 	
 
-	#FUNCION ACTUALIZAR TABLA
+	
 	def actualizar(self):
+		"""actualiza contenido de la tabla"""
 		with open('datos.csv', mode='r') as csv_file:
 			datareader = csv.reader(csv_file)
 			for index, row in enumerate(datareader):
@@ -172,8 +179,9 @@ class Window(QWidget):
 					#print(index,index2)
 					self.tabla.setItem(index,index2,QTableWidgetItem(el))
 
-	#FUNCION CREAR ENTRADA EN TABLA
+	
 	def create(self):
+		"""crear entrada en tabla"""
 		ma = self.marca.text()
 		plat = self.plataforma.text()
 		cant = self.cantidad.text()
@@ -189,6 +197,8 @@ class Window(QWidget):
 			dt = datetime.date(a,m,d)
 		except Exception as e:
 			print('error: ', e)
+			# AGREGAR POPUP WINDOW CON MENSAJE ERROR
+			# 
 
 		lista = [ma,plat,cant,val,dt]
 

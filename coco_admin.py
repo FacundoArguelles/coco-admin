@@ -3,7 +3,7 @@
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import QIcon, QPixmap
 from PyQt5.QtCore import *
-from datetime import date
+import datetime
 import sys
 import csv
 
@@ -12,9 +12,9 @@ class Window(QWidget):
 		QWidget.__init__(self)
 		self.setWindowTitle("CocoAdmin")
 		self.setMinimumWidth(600)
-		self.setMaximumWidth(600)
+		# self.setMaximumWidth(600)
 		self.setMinimumHeight(600)
-		self.setMaximumHeight(600)
+		#self.setMaximumHeight(600)
 
 		#QGRID
 		layout = QGridLayout()
@@ -33,12 +33,8 @@ class Window(QWidget):
 		button.clicked.connect(self.create)
 		layout.addWidget(button,1,8)
 
-		but_today = QPushButton('¿HOY?')
-		#but_today.clicked.connect(self.set_date_today)
-		layout.addWidget(but_today,1,4)
-
 		but_stats = QPushButton("Estadisticas")
-		#but_stats.clicked.connect(self.show_stats)
+		but_stats.clicked.connect(self.show_stats)
 		layout.addWidget(but_stats,4,0)
 
 		#LINEEDIT
@@ -62,6 +58,7 @@ class Window(QWidget):
 		self.dia = QComboBox()
 		for num in range(31):
 			self.dia.addItem(str(num+1))
+		
 		layout.addWidget(self.dia,1,5)
 
 		self.mes1 = QComboBox()
@@ -74,6 +71,13 @@ class Window(QWidget):
 		for num in range(2017,2020):
 			self.anio.addItem(str(num))
 		layout.addWidget(self.anio,1,7)
+
+		#CALENDAR
+		# calendar = QCalendarWidget()
+		# calendar.showToday()
+		# calendar.setMinimumDate(date(2018,1,1))
+		# calendar.setMaximumDate(date(2020,12,31))
+		# layout.addWidget(calendar,1,4)
 
 		#TABLE
 		self.tabla = QTableWidget()
@@ -89,20 +93,70 @@ class Window(QWidget):
 				self.tabla.setRowCount(rr)
 				for index2, el in enumerate(row):
 					self.tabla.setItem(index,index2,QTableWidgetItem(el))
-		
-		
-	#FUNCION SET_DATE_TODAY
-	def set_date_today(self):
-		
-
 
 
 	#FUNCION ESTADISTICAS
-	# def show_stats(self):
-	# 	with open('datos.csv', mode='r') as csv_file:
-	# 		datareader = csv.reader(csv_file)
-	# 		for index, row in enumerate(datareader):
-	# 			for el in row:
+	def show_stats(self):
+		marcas = []
+		plataforma = []
+		cantidad = []
+		gasto = []
+		with open('datos.csv', mode='r') as csv_file:
+			datareader = csv.reader(csv_file)
+			for index, row in enumerate(datareader):
+				for index2, el in enumerate(row):
+					if index2 == 0: marcas.append(el)
+					if index2 == 1: plataforma.append(el)
+					if index2 == 2: cantidad.append(el)
+					if index2 == 3: gasto.append(el)
+
+		m = {}
+		p = {}
+	
+		for idx, el in enumerate(marcas):
+			temp = marcas.count(el)
+			m[el] = temp
+
+		for idx, el in enumerate(plataforma):
+			temp = plataforma.count(el)
+			p[el] = temp
+
+		print(m)
+		print(p)
+
+		#CORREGIR QUE TOMA COMO DIFERENTES NOMBRES EN UP Y LOWCASE
+
+		for key, value in m.items():
+			t = 5
+			label = QLabel(key)
+			layout.addWidget(label,t,0)
+			label = QLabel(value)
+			layout.addWidget(value,t,1)
+			t += 1
+		
+		for key, value in p.items():
+			t = 5
+			label = QLabel(key)
+			layout.addWidget(label,t,2)
+			label = QLabel(value)
+			layout.addWidget(value,t,3)
+			t += 1
+		
+		cant = 0
+		gast = 0
+
+		for elm in cantidad:
+			cant += elm
+		for elm in gasto:
+			gast += elm
+
+		label = QLabel('Total Prendas : '+ cant)
+		layout.addWidget(label,5,4)
+		label = QLabel('Gasto Total : ' + gast)
+		layout.addWidget(label,5,5)
+		
+
+
 	
 
 	#FUNCION LEER
@@ -122,11 +176,16 @@ class Window(QWidget):
 		plat = self.plataforma.text()
 		cant = self.cantidad.text()
 		val = self.valor.text()
-		d = self.dia.currentText()
-		m = self.mes1.currentText()
-		a = self.anio.currentText()
+		d = int(self.dia.currentText())
+		m = self.mes1.currentIndex() + 1
+		a = int(self.anio.currentText())
 
-		lista = [ma,plat,cant,val,[d,m,a]]
+		#
+		#AGREGAR TRY CATCH POR SI LA FECHA ESTA MAL
+		#
+
+		dt = datetime.date(a,m,d)
+		lista = [ma,plat,cant,val,dt]
 
 		with open('datos.csv', mode='a') as csv_file:
 			datawriter = csv.writer(csv_file, delimiter=",")

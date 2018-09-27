@@ -113,18 +113,20 @@ class Window(QWidget):
 		m = {}
 		p = {}
 	
+		#CORREGIR QUE TOMA COMO DIFERENTES NOMBRES EN UP Y LOWCASE
+
 		for idx, el in enumerate(marcas):
-			temp = marcas.count(el)
-			m[el] = temp
+			el_ = el.lower() 
+			temp = marcas.count(el_)
+			m[el_] = temp
 
 		for idx, el in enumerate(plataforma):
-			temp = plataforma.count(el)
-			p[el] = temp
+			el_ = el.lower()
+			temp = plataforma.count(el_)
+			p[el_] = temp
 
 		print(m)
 		print(p)
-
-		#CORREGIR QUE TOMA COMO DIFERENTES NOMBRES EN UP Y LOWCASE
 
 		for key, value in m.items():
 			t = 5
@@ -150,16 +152,16 @@ class Window(QWidget):
 		for elm in gasto:
 			gast += elm
 
-		label = QLabel('Total Prendas : '+ cant)
+		label = QLabel('Total Prendas : ', cant)
 		layout.addWidget(label,5,4)
-		label = QLabel('Gasto Total : ' + gast)
+		label = QLabel('Gasto Total : ', gast)
 		layout.addWidget(label,5,5)
 		
 
 
 	
 
-	#FUNCION LEER
+	#FUNCION ACTUALIZAR TABLA
 	def actualizar(self):
 		with open('datos.csv', mode='r') as csv_file:
 			datareader = csv.reader(csv_file)
@@ -170,7 +172,7 @@ class Window(QWidget):
 					#print(index,index2)
 					self.tabla.setItem(index,index2,QTableWidgetItem(el))
 
-	#FUNCION CREAR
+	#FUNCION CREAR ENTRADA EN TABLA
 	def create(self):
 		ma = self.marca.text()
 		plat = self.plataforma.text()
@@ -183,8 +185,11 @@ class Window(QWidget):
 		#
 		#AGREGAR TRY CATCH POR SI LA FECHA ESTA MAL
 		#
+		try:
+			dt = datetime.date(a,m,d)
+		except Exception as e:
+			print('error: ', e)
 
-		dt = datetime.date(a,m,d)
 		lista = [ma,plat,cant,val,dt]
 
 		with open('datos.csv', mode='a') as csv_file:
@@ -195,10 +200,7 @@ class Window(QWidget):
 		self.plataforma.clear()
 		self.cantidad.clear()
 		self.valor.clear()
-		self.dia.clear()
-		self.mes1.clear()
-		self.anio.clear()
-
+		
 		self.actualizar()
 
 		

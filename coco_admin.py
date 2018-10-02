@@ -58,7 +58,6 @@ class Window(QWidget):
 		self.dia = QComboBox()
 		for num in range(31):
 			self.dia.addItem(str(num+1))
-		
 		layout.addWidget(self.dia,1,5)
 
 		self.mes1 = QComboBox()
@@ -79,25 +78,27 @@ class Window(QWidget):
 		# calendar.setMaximumDate(date(2020,12,31))
 		# layout.addWidget(calendar,1,4)
 
-		# LA TABLA DEJA UN RENGLON EN BLANCO POR CADA FILA CREADA
 
+		# LA TABLA DEJA UN RENGLON EN BLANCO POR CADA FILA CREADA
 		#TABLE
 		self.tabla = QTableWidget()
 		self.tabla.setColumnCount(5)
-		self.tabla.setRowCount(0)
+		self.tabla.setRowCount(1)
 		self.tabla.setShowGrid(True)
 		self.tabla.setHorizontalHeaderLabels(('Marca','Plataforma','Cantidad','Valor','Fecha'))
+		self.tabla.setSortingEnabled(True)
 		layout.addWidget(self.tabla,2,0,1,9)
 		with open('datos.csv', mode='r') as csv_file:
 			datareader = csv.reader(csv_file)
 			for index, row in enumerate(datareader):
+				print('index:',index)
 				rr = self.tabla.rowCount() + 1
 				self.tabla.setRowCount(rr)
 				for index2, el in enumerate(row):
+					print('index2:',index2)
 					self.tabla.setItem(index,index2,QTableWidgetItem(el))
 
-
-	
+	@classmethod
 	def show_stats(self):
 		"""crea y muestra estadisticas"""
 		marcas = []
@@ -117,14 +118,12 @@ class Window(QWidget):
 		p = {}
 	
 		#CORREGIR QUE TOMA COMO DIFERENTES NOMBRES EN UP Y LOWCASE
-		#SACAR ENUMERATE() YA QUE NO USO EL INDEX
-
-		for idx, el in enumerate(marcas):
+		for el in marcas:
 			el_ = el.lower() 
 			temp = marcas.count(el_)
 			m[el_] = temp
 
-		for idx, el in enumerate(plataforma):
+		for el in plataforma:
 			el_ = el.lower()
 			temp = plataforma.count(el_)
 			p[el_] = temp
@@ -137,17 +136,17 @@ class Window(QWidget):
 		for key, value in m.items():
 			t = 5
 			label = QLabel(key)
-			layout.addWidget(label,t,0)
+			self.layout.addWidget(label,t,0)
 			label = QLabel(value)
-			layout.addWidget(value,t,1)
+			self.layout.addWidget(value,t,1)
 			t += 1
 		
 		for key, value in p.items():
 			t = 5
 			label = QLabel(key)
-			layout.addWidget(label,t,2)
+			self.layout.addWidget(label,t,2)
 			label = QLabel(value)
-			layout.addWidget(value,t,3)
+			self.layout.addWidget(value,t,3)
 			t += 1
 		
 		cant = 0
@@ -159,14 +158,10 @@ class Window(QWidget):
 			gast += elm
 
 		label = QLabel('Total Prendas : ', cant)
-		layout.addWidget(label,5,4)
+		self.layout.addWidget(label,5,4)
 		label = QLabel('Gasto Total : ', gast)
-		layout.addWidget(label,5,5)
-		
-
-
+		self.layout.addWidget(label,5,5)
 	
-
 	
 	def actualizar(self):
 		"""actualiza contenido de la tabla"""
@@ -179,7 +174,13 @@ class Window(QWidget):
 					#print(index,index2)
 					self.tabla.setItem(index,index2,QTableWidgetItem(el))
 
-	
+
+	def date_error(self):
+		'''ventana de error en la fecha cargada'''
+		alert = QMessageBox(QMessageBox.Information, "Error","La fecha ingresada es incorrecta", QMessageBox.Ok)
+		alert.exec_()
+
+
 	def create(self):
 		"""crear entrada en tabla"""
 		ma = self.marca.text()
@@ -190,15 +191,11 @@ class Window(QWidget):
 		m = self.mes1.currentIndex() + 1
 		a = int(self.anio.currentText())
 
-		#
-		#AGREGAR TRY CATCH POR SI LA FECHA ESTA MAL
-		#
 		try:
 			dt = datetime.date(a,m,d)
-		except Exception as e:
-			print('error: ', e)
-			# AGREGAR POPUP WINDOW CON MENSAJE ERROR
-			# 
+		except Exception:
+			self.date_error()
+			return
 
 		lista = [ma,plat,cant,val,dt]
 

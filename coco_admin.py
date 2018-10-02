@@ -34,7 +34,7 @@ class Window(QWidget):
 		layout.addWidget(button,1,8)
 
 		but_stats = QPushButton("Estadisticas")
-		but_stats.clicked.connect(self.show_stats)
+		but_stats.clicked.connect(self.calc_stats)
 		layout.addWidget(but_stats,4,0)
 
 		#LINEEDIT
@@ -71,15 +71,9 @@ class Window(QWidget):
 			self.anio.addItem(str(num))
 		layout.addWidget(self.anio,1,7)
 
-		#CALENDAR
-		# calendar = QCalendarWidget()
-		# calendar.showToday()
-		# calendar.setMinimumDate(date(2018,1,1))
-		# calendar.setMaximumDate(date(2020,12,31))
-		# layout.addWidget(calendar,1,4)
-
-
 		# LA TABLA DEJA UN RENGLON EN BLANCO POR CADA FILA CREADA
+		# SORTING NO FUNCIONA BIEN
+		
 		#TABLE
 		self.tabla = QTableWidget()
 		self.tabla.setColumnCount(5)
@@ -98,9 +92,40 @@ class Window(QWidget):
 					print('index2:',index2)
 					self.tabla.setItem(index,index2,QTableWidgetItem(el))
 
-	@classmethod
-	def show_stats(self):
-		"""crea y muestra estadisticas"""
+
+	def show_stats(self, marcas, plat, cant, gasto):
+		"""muestra estadisticas"""
+		d = QDialog()
+		l = QGridLayout()
+		d.setLayout(l)
+
+		t = 0
+		for key, value in marcas.items():
+			label = QLabel(str(key))
+			l.addWidget(label,t,0)
+			label = QLabel(str(value))
+			l.addWidget(label,t,1)
+			t += 1
+
+		t = 0
+		for key, value in plat.items():
+			label = QLabel(str(key))
+			l.addWidget(label,t,2)
+			label = QLabel(str(value))
+			l.addWidget(label,t,3)
+			t += 1
+
+		label = QLabel('Total Prendas : %i' % (cant))
+		l.addWidget(label,5,4)
+		label = QLabel('Gasto Total : %i' % (gasto))
+		l.addWidget(label,5,5)
+
+		d.exec_()
+
+
+	
+	def calc_stats(self):
+		"""crea estadisticas"""
 		marcas = []
 		plataforma = []
 		cantidad = []
@@ -131,37 +156,17 @@ class Window(QWidget):
 		print(m)
 		print(p)
 
-		# CORREGIR: NAME LAYOUT IS NOT DEFINED
-
-		for key, value in m.items():
-			t = 5
-			label = QLabel(key)
-			self.layout.addWidget(label,t,0)
-			label = QLabel(value)
-			self.layout.addWidget(value,t,1)
-			t += 1
-		
-		for key, value in p.items():
-			t = 5
-			label = QLabel(key)
-			self.layout.addWidget(label,t,2)
-			label = QLabel(value)
-			self.layout.addWidget(value,t,3)
-			t += 1
-		
 		cant = 0
 		gast = 0
 
 		for elm in cantidad:
-			cant += elm
+			cant += int(elm)
 		for elm in gasto:
-			gast += elm
+			gast += int(elm)
 
-		label = QLabel('Total Prendas : ', cant)
-		self.layout.addWidget(label,5,4)
-		label = QLabel('Gasto Total : ', gast)
-		self.layout.addWidget(label,5,5)
-	
+		self.show_stats(m,p,cant,gast)
+
+
 	
 	def actualizar(self):
 		"""actualiza contenido de la tabla"""

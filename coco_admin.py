@@ -6,6 +6,7 @@ from PyQt5.QtCore import *
 import datetime
 import sys
 import csv
+import codecs
 
 class Window(QWidget):
 	def __init__(self):
@@ -71,8 +72,9 @@ class Window(QWidget):
 			self.anio.addItem(str(num))
 		layout.addWidget(self.anio,1,7)
 
-		# LA TABLA DEJA UN RENGLON EN BLANCO POR CADA FILA CREADA
-		# SORTING NO FUNCIONA BIEN
+		
+		
+		# SORTING NO FUNCIONA BIEN EN TODAS LAS COLUMNAS
 		
 		#TABLE
 		self.tabla = QTableWidget()
@@ -80,10 +82,11 @@ class Window(QWidget):
 		self.tabla.setRowCount(1)
 		self.tabla.setShowGrid(True)
 		self.tabla.setHorizontalHeaderLabels(('Marca','Plataforma','Cantidad','Valor','Fecha'))
+		self.tabla.setEditTriggers(self.tabla.NoEditTriggers)
 		self.tabla.setSortingEnabled(True)
 		layout.addWidget(self.tabla,2,0,1,9)
-		with open('datos.csv', mode='r') as csv_file:
-			datareader = csv.reader(csv_file)
+		with open('datos.csv', mode='r') as f:
+			datareader = csv.reader(f)
 			for index, row in enumerate(datareader):
 				print('index:',index)
 				rr = self.tabla.rowCount() + 1
@@ -94,7 +97,7 @@ class Window(QWidget):
 
 
 	def show_stats(self, marcas, plat, cant, gasto):
-		"""muestra estadisticas"""
+		"""crea ventana para mostrar estadisticas"""
 		d = QDialog()
 		l = QGridLayout()
 		d.setLayout(l)
@@ -122,7 +125,6 @@ class Window(QWidget):
 
 		d.exec_()
 
-
 	
 	def calc_stats(self):
 		"""crea estadisticas"""
@@ -142,7 +144,8 @@ class Window(QWidget):
 		m = {}
 		p = {}
 	
-		#CORREGIR QUE TOMA COMO DIFERENTES NOMBRES EN UP Y LOWCASE
+		#LOWER() TOMA SOLO LOS NOMBRES QUE EMPIEZAN EN MINUSCULAS ME PARECE
+		#AUNQUE DEBERIA FUNCIONAR
 		for el in marcas:
 			el_ = el.lower() 
 			temp = marcas.count(el_)
@@ -165,7 +168,6 @@ class Window(QWidget):
 			gast += int(elm)
 
 		self.show_stats(m,p,cant,gast)
-
 
 	
 	def actualizar(self):
@@ -205,7 +207,7 @@ class Window(QWidget):
 		lista = [ma,plat,cant,val,dt]
 
 		with open('datos.csv', mode='a') as csv_file:
-			datawriter = csv.writer(csv_file, delimiter=",")
+			datawriter = csv.writer(csv_file, delimiter=",", lineterminator='\n')
 			datawriter.writerow(item for item in lista)
 			
 		self.marca.clear()

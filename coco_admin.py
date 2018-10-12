@@ -6,7 +6,7 @@ from PyQt5.QtCore import *
 import datetime
 import sys
 import csv
-import codecs
+
 
 class Window(QWidget):
 	def __init__(self):
@@ -16,6 +16,7 @@ class Window(QWidget):
 		#self.setMaximumWidth(600)
 		self.setMinimumHeight(600)
 		#self.setMaximumHeight(600)
+		self.setStyleSheet('background-color:#ffe2bd;')
 
 		#QGRID
 		layout = QGridLayout()
@@ -33,45 +34,53 @@ class Window(QWidget):
 		button = QPushButton("CREAR")
 		button.clicked.connect(self.create)
 		layout.addWidget(button,1,8)
+		button.setStyleSheet('background-color:; margin-bottom: 10px; border-radius: 20px; border: 3px solid gray')
 
 		but_stats = QPushButton("Estadisticas")
 		but_stats.clicked.connect(self.calc_stats)
 		layout.addWidget(but_stats,4,0)
+		but_stats.setStyleSheet('background-color:#f1e767; margin-top: 10px; border-radius: 20px; border: 3px solid gray')
 
 		#LINEEDIT
 		self.marca = QLineEdit()
 		self.marca.setPlaceholderText("Marca")
 		layout.addWidget(self.marca,1,0)
+		self.marca.setStyleSheet('background-color:#f1e767; margin-bottom: 10px; border-radius: 10px; border: 3px solid gray')
 
 		self.plataforma = QLineEdit()
 		self.plataforma.setPlaceholderText("Plataforma")
 		layout.addWidget(self.plataforma,1,1)
+		self.plataforma.setStyleSheet('background-color:#f1e767; margin-bottom: 10px; border-radius: 10px; border: 3px solid gray')
 
 		self.cantidad = QLineEdit()
 		self.cantidad.setPlaceholderText("Cantidad")
 		layout.addWidget(self.cantidad,1,2)
+		self.cantidad.setStyleSheet('background-color:#f1e767; margin-bottom: 10px; border-radius: 10px; border: 3px solid gray')
 
 		self.valor = QLineEdit()
 		self.valor.setPlaceholderText("Valor")
 		layout.addWidget(self.valor,1,3)
+		self.valor.setStyleSheet('background-color:#f1e767; margin-bottom: 10px; border-radius: 10px; border: 3px solid gray')
 
 		#COMBOBOX
 		self.dia = QComboBox()
 		for num in range(31):
 			self.dia.addItem(str(num+1))
 		layout.addWidget(self.dia,1,5)
+		self.dia.setStyleSheet('background-color: 000000; margin-bottom: 10px; ')
 
 		self.mes1 = QComboBox()
 		meses = ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"]
 		for mes in meses:
 			self.mes1.addItem(mes)
 		layout.addWidget(self.mes1,1,6)
+		self.mes1.setStyleSheet('background-color: 000000; margin-bottom: 10px; ')
 
 		self.anio = QComboBox()
 		for num in range(2017,2020):
 			self.anio.addItem(str(num))
 		layout.addWidget(self.anio,1,7)
-
+		self.anio.setStyleSheet('background-color: 000000; margin-bottom: 10px; ')
 		
 		
 		# SORTING NO FUNCIONA BIEN EN TODAS LAS COLUMNAS
@@ -82,17 +91,21 @@ class Window(QWidget):
 		self.tabla.setRowCount(1)
 		self.tabla.setShowGrid(True)
 		self.tabla.setHorizontalHeaderLabels(('Marca','Plataforma','Cantidad','Valor','Fecha'))
+		self.tabla.setStyleSheet('background-color:#d6f9ff; border-radius: 30px; border: 2px solid gray;')
+		self.tabla.horizontalHeader().setStyleSheet('background-color:#d6f9ff; border-radius: 30px; border: 2px solid gray;')
+		#self.tabla.horizontalHeaderItem(0).setStyleSheet('border-radius: 30')
 		self.tabla.setEditTriggers(self.tabla.NoEditTriggers)
 		self.tabla.setSortingEnabled(True)
+		
 		layout.addWidget(self.tabla,2,0,1,9)
 		with open('datos.csv', mode='r') as f:
 			datareader = csv.reader(f)
 			for index, row in enumerate(datareader):
-				print('index:',index)
+				#print('index:',index)
 				rr = self.tabla.rowCount() + 1
 				self.tabla.setRowCount(rr)
 				for index2, el in enumerate(row):
-					print('index2:',index2)
+					#print('index2:',index2)
 					self.tabla.setItem(index,index2,QTableWidgetItem(el))
 
 
@@ -156,8 +169,8 @@ class Window(QWidget):
 			temp = plataforma.count(el_)
 			p[el_] = temp
 
-		print(m)
-		print(p)
+		# print(m)
+		# print(p)
 
 		cant = 0
 		gast = 0

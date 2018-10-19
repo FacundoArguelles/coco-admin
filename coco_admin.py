@@ -34,7 +34,7 @@ class Window(QWidget):
 		button = QPushButton("CREAR")
 		button.clicked.connect(self.create)
 		layout.addWidget(button,1,8)
-		button.setStyleSheet('background-color:; margin-bottom: 10px; border-radius: 20px; border: 3px solid gray')
+		button.setStyleSheet('margin-bottom: 10px;')
 
 		but_stats = QPushButton("Estadisticas")
 		but_stats.clicked.connect(self.calc_stats)
@@ -45,7 +45,7 @@ class Window(QWidget):
 		self.marca = QLineEdit()
 		self.marca.setPlaceholderText("Marca")
 		layout.addWidget(self.marca,1,0)
-		self.marca.setStyleSheet('background-color:#f1e767; margin-bottom: 10px; border-radius: 10px; border: 3px solid gray')
+		self.marca.setStyleSheet('background-color:#f1e767; margin-bottom: 10px; border-radius: 10px; border: 3px solid gray; color: white;')
 
 		self.plataforma = QLineEdit()
 		self.plataforma.setPlaceholderText("Plataforma")
@@ -83,7 +83,7 @@ class Window(QWidget):
 		self.anio.setStyleSheet('background-color: 000000; margin-bottom: 10px; ')
 		
 		
-		# SORTING NO FUNCIONA BIEN EN TODAS LAS COLUMNAS
+		# PARA ORDENAR, SORTING SOLO TOMA EL PRIMER NUMERO DE CADA FILA, NO TOMA EL NUMERO ENTERO
 		
 		#TABLE
 		self.tabla = QTableWidget()
@@ -169,9 +169,6 @@ class Window(QWidget):
 			temp = plataforma.count(el_)
 			p[el_] = temp
 
-		# print(m)
-		# print(p)
-
 		cant = 0
 		gast = 0
 
@@ -198,6 +195,14 @@ class Window(QWidget):
 	def date_error(self):
 		'''ventana de error en la fecha cargada'''
 		alert = QMessageBox(QMessageBox.Information, "Error","La fecha ingresada es incorrecta", QMessageBox.Ok)
+		alert.setStyleSheet('background-color:#ffe2bd;')
+		alert.exec_()
+
+
+	def empty_error(self, param):
+		'''ventana de error por faltar valores'''
+		alert = QMessageBox(QMessageBox.Information, "Error",f" {param} No ha sido completados", QMessageBox.Ok)
+		alert.setStyleSheet('background-color:#ffe2bd;')
 		alert.exec_()
 
 
@@ -210,6 +215,21 @@ class Window(QWidget):
 		d = int(self.dia.currentText())
 		m = self.mes1.currentIndex() + 1
 		a = int(self.anio.currentText())
+
+		#Chequeando si estan completos todos las entradas
+		check = {'marca': ma, 'plataforma': plat, 'cantidad': cant, 'valor': val}
+		param = []
+		count = 0
+
+		for key, value in check.items():
+			if value == '':
+				param.append(key)
+				count += 1
+
+		if count > 0:
+			self.empty_error(param)
+			return
+
 
 		try:
 			dt = datetime.date(a,m,d)

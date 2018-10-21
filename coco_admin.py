@@ -96,6 +96,7 @@ class Window(QWidget):
 		#self.tabla.horizontalHeaderItem(0).setStyleSheet('border-radius: 30')
 		self.tabla.setEditTriggers(self.tabla.NoEditTriggers)
 		self.tabla.setSortingEnabled(True)
+		#self.tabla.sortItems(Qt.AscendingOrder)
 		
 		layout.addWidget(self.tabla,2,0,1,9)
 		with open('datos.csv', mode='r') as f:
@@ -108,7 +109,8 @@ class Window(QWidget):
 					#print('index2:',index2)
 					self.tabla.setItem(index,index2,QTableWidgetItem(el))
 
-
+	#FALTAN ETIQUETAS
+	#FALTA ESTILO VISUAL
 	def show_stats(self, marcas, plat, cant, gasto):
 		"""crea ventana para mostrar estadisticas"""
 		d = QDialog()
@@ -157,17 +159,15 @@ class Window(QWidget):
 		m = {}
 		p = {}
 	
-		#LOWER() TOMA SOLO LOS NOMBRES QUE EMPIEZAN EN MINUSCULAS ME PARECE
-		#AUNQUE DEBERIA FUNCIONAR
-		for el in marcas:
-			el_ = el.lower() 
-			temp = marcas.count(el_)
-			m[el_] = temp
+		marcas_lower = [el.lower() for el in marcas]
+		for el in marcas_lower:
+			temp = marcas_lower.count(el)
+			m[el] = temp
 
-		for el in plataforma:
-			el_ = el.lower()
-			temp = plataforma.count(el_)
-			p[el_] = temp
+		plataforma_lower = [el.lower() for el in plataforma]
+		for el in plataforma_lower:
+			temp = plataforma_lower.count(el)
+			p[el] = temp
 
 		cant = 0
 		gast = 0
@@ -216,7 +216,7 @@ class Window(QWidget):
 		m = self.mes1.currentIndex() + 1
 		a = int(self.anio.currentText())
 
-		#Chequeando si estan completos todos las entradas
+		#Chequeando si estan completos todas las entradas
 		check = {'marca': ma, 'plataforma': plat, 'cantidad': cant, 'valor': val}
 		param = []
 		count = 0

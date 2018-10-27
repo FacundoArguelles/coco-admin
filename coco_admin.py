@@ -84,6 +84,7 @@ class Window(QWidget):
 		
 		
 		# PARA ORDENAR, SORTING SOLO TOMA EL PRIMER NUMERO DE CADA FILA, NO TOMA EL NUMERO ENTERO
+		# QUE LA ULTIMA ENTRADA CREADA APAREZCA PRIMERA EN LA TABLA, NO ULTIMA
 		
 		#TABLE
 		self.tabla = QTableWidget()
@@ -147,6 +148,7 @@ class Window(QWidget):
 		plataforma = []
 		cantidad = []
 		gasto = []
+		#lee el archivo
 		with open('datos.csv', mode='r') as csv_file:
 			datareader = csv.reader(csv_file)
 			for index, row in enumerate(datareader):
@@ -158,7 +160,10 @@ class Window(QWidget):
 
 		m = {}
 		p = {}
-	
+
+		'''pasa los nombres a minusculas para poder contarlos bien y que no cuente como diferentes a los mismos nombres
+		ingresados en upper y lower...
+		cuenta cantidad de cada nombre'''
 		marcas_lower = [el.lower() for el in marcas]
 		for el in marcas_lower:
 			temp = marcas_lower.count(el)
@@ -172,6 +177,7 @@ class Window(QWidget):
 		cant = 0
 		gast = 0
 
+		#Suma gastos y cantidad totales
 		for elm in cantidad:
 			cant += int(elm)
 		for elm in gasto:
@@ -216,7 +222,7 @@ class Window(QWidget):
 		m = self.mes1.currentIndex() + 1
 		a = int(self.anio.currentText())
 
-		#Chequeando si estan completos todas las entradas
+		#Chequeando si estan completas todas las entradas
 		check = {'marca': ma, 'plataforma': plat, 'cantidad': cant, 'valor': val}
 		param = []
 		count = 0
@@ -230,24 +236,47 @@ class Window(QWidget):
 			self.empty_error(param)
 			return
 
+		#chequeando si tienen espacios en blanco al principio y al final y sacandolos
+		cleaned_start = {}
+		cleaned_end = {}
 
+		for key, value in check.items():
+			if value.startswith((' ','  ','   ')):
+				temp_str = value.lstrip()
+				cleaned_start[key] = temp_str
+			else:
+				cleaned_start[key] = value
+
+		for key, value in cleaned_start.items():
+			if value.endswith((' ','  ','   ')):
+				temp_str2 = value.rstrip()
+				cleaned_end[key] = temp_str2
+			else:
+				cleaned_end[key] = value
+
+		#probar si la fecha es correcta
 		try:
 			dt = datetime.date(a,m,d)
 		except Exception:
 			self.date_error()
 			return
 
-		lista = [ma,plat,cant,val,dt]
+		#creando la lista para guardar
+		lista = [cleaned_end[i] for i in cleaned_end]
+		lista.append(dt)
 
+		#guardar datos
 		with open('datos.csv', mode='a') as csv_file:
 			datawriter = csv.writer(csv_file, delimiter=",", lineterminator='\n')
 			datawriter.writerow(item for item in lista)
 			
+		#vaciar entradas en la interfaz
 		self.marca.clear()
 		self.plataforma.clear()
 		self.cantidad.clear()
 		self.valor.clear()
 		
+		#actualiza la tabla que ve el usuario con la nueva entrada creada
 		self.actualizar()
 
 		

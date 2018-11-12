@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
 
-from PyQt5.QtWidgets import *
-from PyQt5.QtGui import QIcon, QPixmap
-from PyQt5.QtCore import *
 import datetime
 import sys
 import csv
+from PyQt5.QtWidgets import *
+from PyQt5.QtGui import QIcon, QPixmap
+from PyQt5.QtCore import *
+
 
 
 class Window(QWidget):

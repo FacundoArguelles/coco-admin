@@ -45,9 +45,10 @@ def delete_venta(v_id):
 	conn.close()
 
 
-def update_venta(venta, what):
-	with conn:
-		c.execute("UPDATE ventas SET  WHERE")
+# def update_venta(v_id):
+# 	conn = sqlite3.connect('data/ventas.db')
+# 	c = conn.cursor()
+# 	c.execute("UPDATE ventas SET  WHERE venta_id=:venta_id", {'venta_id':v_id})
 
 
 

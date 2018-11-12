@@ -12,7 +12,7 @@ class Venta:
 		try:
 			dt = datetime.date(anio, mes, dia)
 			self.fecha = dt
-			print(f'fecha==={dt}')
+			#print(f'fecha==={dt}')
 		except Exception as e:
 			print(f'exception==={e}')
 

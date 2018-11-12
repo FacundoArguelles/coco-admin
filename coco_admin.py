@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-
 import datetime
 import sys
-import csv
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import QIcon, QPixmap
 from PyQt5.QtCore import *
+from sqlite3_test import *
+from sqlite3_classes_test import Venta
 
 
 
@@ -18,6 +18,7 @@ class Window(QWidget):
 		self.setMinimumHeight(600)
 		#self.setMaximumHeight(600)
 		self.setStyleSheet('background-color:#ffe2bd;')
+		self.setWindowIcon(QIcon('icon.png'))
 
 		#QGRID
 		layout = QGridLayout()
@@ -28,88 +29,100 @@ class Window(QWidget):
 		logo = QPixmap('Etiqueta2.jpg')
 		smaller_logo = logo.scaled(160, 80)
 		label.setPixmap(smaller_logo)
+		label.setStyleSheet('margin-bottom: 10px; margin-left: 50px;')
 		layout.addWidget(label,0,2,1,4)
 		#label.setAlignment(Qt.AlignHCenter)
 
 		#BUTTON
 		button = QPushButton("CREAR")
 		button.clicked.connect(self.create)
-		layout.addWidget(button,1,8)
-		button.setStyleSheet('margin-bottom: 10px;')
+		layout.addWidget(button,1,8,1,2)
+		button.setStyleSheet('background: #ffffff; font: bold;')
+
+		button = QPushButton("BORRAR")
+		button.clicked.connect(self.delete)
+		layout.addWidget(button,4,9)
+		button.setStyleSheet('background-color: red; font: bold;')
 
 		but_stats = QPushButton("Estadisticas")
 		but_stats.clicked.connect(self.calc_stats)
 		layout.addWidget(but_stats,4,0)
-		but_stats.setStyleSheet('background-color:#f1e767; margin-top: 10px; border-radius: 20px; border: 3px solid gray')
+		but_stats.setStyleSheet('background-color:#f1e767; margin-top: 10px; border-width: 3px; border-color: solid gray;')
 
 		#LINEEDIT
 		self.marca = QLineEdit()
 		self.marca.setPlaceholderText("Marca")
 		layout.addWidget(self.marca,1,0)
-		self.marca.setStyleSheet('background-color:#f1e767; margin-bottom: 10px; border-radius: 10px; border: 3px solid gray; color: white;')
+		self.marca.setStyleSheet('background-color:#f1e767; border-radius: 10px; border: 3px solid gray;')
 
 		self.plataforma = QLineEdit()
 		self.plataforma.setPlaceholderText("Plataforma")
 		layout.addWidget(self.plataforma,1,1)
-		self.plataforma.setStyleSheet('background-color:#f1e767; margin-bottom: 10px; border-radius: 10px; border: 3px solid gray')
+		self.plataforma.setStyleSheet('background-color:#f1e767; border-radius: 10px; border: 3px solid gray')
 
 		self.cantidad = QLineEdit()
 		self.cantidad.setPlaceholderText("Cantidad")
 		layout.addWidget(self.cantidad,1,2)
-		self.cantidad.setStyleSheet('background-color:#f1e767; margin-bottom: 10px; border-radius: 10px; border: 3px solid gray')
+		self.cantidad.setStyleSheet('background-color:#f1e767; border-radius: 10px; border: 3px solid gray')
 
 		self.valor = QLineEdit()
 		self.valor.setPlaceholderText("Valor")
 		layout.addWidget(self.valor,1,3)
-		self.valor.setStyleSheet('background-color:#f1e767; margin-bottom: 10px; border-radius: 10px; border: 3px solid gray')
+		self.valor.setStyleSheet('background-color:#f1e767; border-radius: 10px; border: 3px solid gray')
 
 		#COMBOBOX
 		self.dia = QComboBox()
 		for num in range(31):
 			self.dia.addItem(str(num+1))
 		layout.addWidget(self.dia,1,5)
-		self.dia.setStyleSheet('background-color: 000000; margin-bottom: 10px; ')
+		self.dia.setStyleSheet('background-color: #ffffff; ')
 
 		self.mes1 = QComboBox()
 		meses = ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"]
 		for mes in meses:
 			self.mes1.addItem(mes)
 		layout.addWidget(self.mes1,1,6)
-		self.mes1.setStyleSheet('background-color: 000000; margin-bottom: 10px; ')
+		self.mes1.setStyleSheet('background-color: #ffffff; ')
 
 		self.anio = QComboBox()
 		for num in range(2017,2020):
 			self.anio.addItem(str(num))
 		layout.addWidget(self.anio,1,7)
-		self.anio.setStyleSheet('background-color: 000000; margin-bottom: 10px; ')
+		self.anio.setStyleSheet('background-color: #ffffff; ')
 		
 		
-		# PARA ORDENAR, SORTING SOLO TOMA EL PRIMER NUMERO DE CADA FILA, NO TOMA EL NUMERO ENTERO
 		# QUE LA ULTIMA ENTRADA CREADA APAREZCA PRIMERA EN LA TABLA, NO ULTIMA
 		
 		#TABLE
 		self.tabla = QTableWidget()
-		self.tabla.setColumnCount(5)
+		self.tabla.setColumnCount(6)
 		self.tabla.setRowCount(1)
 		self.tabla.setShowGrid(True)
-		self.tabla.setHorizontalHeaderLabels(('Marca','Plataforma','Cantidad','Valor','Fecha'))
-		self.tabla.setStyleSheet('background-color:#d6f9ff; border-radius: 30px; border: 2px solid gray;')
-		self.tabla.horizontalHeader().setStyleSheet('background-color:#d6f9ff; border-radius: 30px; border: 2px solid gray;')
+		self.tabla.setHorizontalHeaderLabels(('Venta','Marca','Plataforma','Cantidad','Valor','Fecha'))
+		self.tabla.setStyleSheet('background-color:#d6f9ff; border-radius: 20px; border: 2px solid gray;')
+		#self.tabla.horizontalHeader().setStyleSheet('background-color:#d6f9ff; border-radius: 30px; border: 2px solid gray;')
+		self.tabla.horizontalHeader().setSectionResizeMode(0, QHeaderView.ResizeToContents)
+		self.tabla.horizontalHeader().setSectionResizeMode(1, QHeaderView.Stretch)
+		self.tabla.horizontalHeader().setSectionResizeMode(2, QHeaderView.Stretch)
+		self.tabla.horizontalHeader().setSectionResizeMode(3, QHeaderView.ResizeToContents)
+		self.tabla.horizontalHeader().setSectionResizeMode(4, QHeaderView.ResizeToContents)
+		self.tabla.horizontalHeader().setSectionResizeMode(5, QHeaderView.ResizeToContents)
+		#self.tabla.verticalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
 		#self.tabla.horizontalHeaderItem(0).setStyleSheet('border-radius: 30')
+		self.tabla.setSelectionMode(QAbstractItemView.SingleSelection)
 		self.tabla.setEditTriggers(self.tabla.NoEditTriggers)
-		self.tabla.setSortingEnabled(True)
-		#self.tabla.sortItems(Qt.AscendingOrder)
-		
-		layout.addWidget(self.tabla,2,0,1,9)
-		with open('datos.csv', mode='r') as f:
-			datareader = csv.reader(f)
-			for index, row in enumerate(datareader):
-				#print('index:',index)
-				rr = self.tabla.rowCount() + 1
-				self.tabla.setRowCount(rr)
-				for index2, el in enumerate(row):
-					#print('index2:',index2)
-					self.tabla.setItem(index,index2,QTableWidgetItem(el))
+		self.tabla.setSortingEnabled(False)
+		self.tabla.verticalHeader().hide()
+		'''ya se... no ordena bien el contenido de las columnas, porque los numeros que aparecen
+		en realidad son strings.. porque los tengo que convertir porque si no no los muestra'''
+		layout.addWidget(self.tabla,2,0,1,10)
+
+		check_table()
+		for index, row in enumerate(get_all_ventas()):
+			row_count = self.tabla.rowCount() + 1
+			self.tabla.setRowCount(row_count)
+			for index2, attr in enumerate(row):
+				self.tabla.setItem(index,index2,QTableWidgetItem(str(attr)))
 
 	#FALTAN ETIQUETAS
 	#FALTA ESTILO VISUAL
@@ -118,8 +131,14 @@ class Window(QWidget):
 		d = QDialog()
 		l = QGridLayout()
 		d.setLayout(l)
+		d.setStyleSheet('background-color:#ffe2bd;')
+		label = QLabel('Marcas:')
+		l.addWidget(label,0,0)
+		label = QLabel('Plataforma:')
+		l.addWidget(label,0,2)
 
-		t = 0
+
+		t = 1
 		for key, value in marcas.items():
 			label = QLabel(str(key))
 			l.addWidget(label,t,0)
@@ -127,7 +146,7 @@ class Window(QWidget):
 			l.addWidget(label,t,1)
 			t += 1
 
-		t = 0
+		t = 1
 		for key, value in plat.items():
 			label = QLabel(str(key))
 			l.addWidget(label,t,2)
@@ -149,15 +168,14 @@ class Window(QWidget):
 		plataforma = []
 		cantidad = []
 		gasto = []
-		#lee el archivo
-		with open('datos.csv', mode='r') as csv_file:
-			datareader = csv.reader(csv_file)
-			for index, row in enumerate(datareader):
-				for index2, el in enumerate(row):
-					if index2 == 0: marcas.append(el)
-					if index2 == 1: plataforma.append(el)
-					if index2 == 2: cantidad.append(el)
-					if index2 == 3: gasto.append(el)
+
+		#lee la db
+		for index, row in enumerate(get_all_ventas()):
+			for index2, attr in enumerate(row):
+				if index2 == 1: marcas.append(attr)
+				if index2 == 2: plataforma.append(attr)
+				if index2 == 3: cantidad.append(attr)
+				if index2 == 4: gasto.append(attr)
 
 		m = {}
 		p = {}
@@ -187,16 +205,18 @@ class Window(QWidget):
 		self.show_stats(m,p,cant,gast)
 
 	
-	def actualizar(self):
+	def actualizar(self, signal=True):
 		"""actualiza contenido de la tabla"""
-		with open('datos.csv', mode='r') as csv_file:
-			datareader = csv.reader(csv_file)
-			for index, row in enumerate(datareader):
-				rr = self.tabla.rowCount() + 1
-				self.tabla.setRowCount(rr)
-				for index2, el in enumerate(row):
-					#print(index,index2)
-					self.tabla.setItem(index,index2,QTableWidgetItem(el))
+		if signal:
+			row_count = self.tabla.rowCount() + 1
+			self.tabla.setRowCount(row_count)
+		else:
+			row_count = self.tabla.rowCount() - 1
+			self.tabla.setRowCount(row_count)
+
+		for index, row in enumerate(get_all_ventas()):
+			for index2, attr in enumerate(row):
+				self.tabla.setItem(index,index2,QTableWidgetItem(str(attr)))
 
 
 	def date_error(self):
@@ -228,6 +248,7 @@ class Window(QWidget):
 		param = []
 		count = 0
 
+		#contando si faltaron completar campos
 		for key, value in check.items():
 			if value == '':
 				param.append(key)
@@ -237,10 +258,10 @@ class Window(QWidget):
 			self.empty_error(param)
 			return
 
-		#chequeando si tienen espacios en blanco al principio y al final y sacandolos
 		cleaned_start = {}
 		cleaned_end = {}
 
+		#chequeando si tienen espacios en blanco al principio
 		for key, value in check.items():
 			if value.startswith((' ','  ','   ')):
 				temp_str = value.lstrip()
@@ -248,6 +269,7 @@ class Window(QWidget):
 			else:
 				cleaned_start[key] = value
 
+		#chequeando si tienen espacios en blanco al final
 		for key, value in cleaned_start.items():
 			if value.endswith((' ','  ','   ')):
 				temp_str2 = value.rstrip()
@@ -255,22 +277,17 @@ class Window(QWidget):
 			else:
 				cleaned_end[key] = value
 
-		#probar si la fecha es correcta
+		#creando la venta para guardar
 		try:
-			dt = datetime.date(a,m,d)
-		except Exception:
+			vent = Venta(cleaned_end['marca'], cleaned_end['plataforma'], cleaned_end['cantidad'], cleaned_end['valor'], d, m, a)
+		except Exception as e:
+			print(f'exc en coco ==={e}')
 			self.date_error()
 			return
 
-		#creando la lista para guardar
-		lista = [cleaned_end[i] for i in cleaned_end]
-		lista.append(dt)
-
 		#guardar datos
-		with open('datos.csv', mode='a') as csv_file:
-			datawriter = csv.writer(csv_file, delimiter=",", lineterminator='\n')
-			datawriter.writerow(item for item in lista)
-			
+		insert_venta(vent)
+
 		#vaciar entradas en la interfaz
 		self.marca.clear()
 		self.plataforma.clear()
@@ -279,6 +296,12 @@ class Window(QWidget):
 		
 		#actualiza la tabla que ve el usuario con la nueva entrada creada
 		self.actualizar()
+
+	def delete(self):
+		row = self.tabla.currentItem().row()
+		item = self.tabla.item(row, 0).text()
+		delete_venta(item)
+		self.actualizar(signal=False)
 
 		
 	

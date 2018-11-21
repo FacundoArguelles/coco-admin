@@ -1,5 +1,5 @@
 import sqlite3
-from sqlite3_classes_test import Venta
+from Venta_class import Venta
 
 
 def check_table():

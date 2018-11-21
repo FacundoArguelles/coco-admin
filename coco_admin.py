@@ -4,8 +4,8 @@ import sys
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import QIcon, QPixmap
 from PyQt5.QtCore import *
-from sqlite3_test import *
-from sqlite3_classes_test import Venta
+from db_api import *
+from Venta_class import Venta
 
 
 
@@ -111,20 +111,22 @@ class Window(QWidget):
 		#self.tabla.horizontalHeaderItem(0).setStyleSheet('border-radius: 30')
 		self.tabla.setSelectionMode(QAbstractItemView.SingleSelection)
 		self.tabla.setEditTriggers(self.tabla.NoEditTriggers)
-		self.tabla.setSortingEnabled(False)
+		self.tabla.setSortingEnabled(True)
 		self.tabla.verticalHeader().hide()
 		'''ya se... no ordena bien el contenido de las columnas, porque los numeros que aparecen
 		en realidad son strings.. porque los tengo que convertir porque si no no los muestra'''
 		layout.addWidget(self.tabla,2,0,1,10)
 
 		check_table()
+		row_count = 1
 		for index, row in enumerate(get_all_ventas()):
-			row_count = self.tabla.rowCount() + 1
+			#row_count = self.tabla.rowCount() + 1
 			self.tabla.setRowCount(row_count)
 			for index2, attr in enumerate(row):
 				self.tabla.setItem(index,index2,QTableWidgetItem(str(attr)))
+			row_count += 1
 
-	#FALTAN ETIQUETAS
+	
 	#FALTA ESTILO VISUAL
 	def show_stats(self, marcas, plat, cant, gasto):
 		"""crea ventana para mostrar estadisticas"""
@@ -258,28 +260,14 @@ class Window(QWidget):
 			self.empty_error(param)
 			return
 
-		cleaned_start = {}
-		cleaned_end = {}
-
+		cleaned = {}
 		#chequeando si tienen espacios en blanco al principio
 		for key, value in check.items():
-			if value.startswith((' ','  ','   ')):
-				temp_str = value.lstrip()
-				cleaned_start[key] = temp_str
-			else:
-				cleaned_start[key] = value
-
-		#chequeando si tienen espacios en blanco al final
-		for key, value in cleaned_start.items():
-			if value.endswith((' ','  ','   ')):
-				temp_str2 = value.rstrip()
-				cleaned_end[key] = temp_str2
-			else:
-				cleaned_end[key] = value
+			cleaned[key] = value.strip()
 
 		#creando la venta para guardar
 		try:
-			vent = Venta(cleaned_end['marca'], cleaned_end['plataforma'], cleaned_end['cantidad'], cleaned_end['valor'], d, m, a)
+			vent = Venta(cleaned['marca'], cleaned['plataforma'], cleaned['cantidad'], cleaned['valor'], d, m, a)
 		except Exception as e:
 			print(f'exc en coco ==={e}')
 			self.date_error()

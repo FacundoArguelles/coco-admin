@@ -3,22 +3,24 @@ from Venta_class import Venta
 
 
 def check_table():
-	conn = sqlite3.connect('data/ventas.db')
-	c = conn.cursor()
-	c.execute('''CREATE table IF NOT EXISTS ventas (
-					venta_id INTEGER PRIMARY KEY,
-					marca text,
-					plataforma text,
-					cantidad integer,
-					valor real,
-					fecha text
-					)''')
-	conn.commit()
-	conn.close()
-
+	try:
+		conn = sqlite3.connect('ventas.db')
+		c = conn.cursor()
+		c.execute('''CREATE table IF NOT EXISTS ventas (
+						venta_id INTEGER PRIMARY KEY,
+						marca text,
+						plataforma text,
+						cantidad integer,
+						valor real,
+						fecha text
+						)''')
+		conn.commit()
+		conn.close()
+	except Exception as e:
+		print(e)
 
 def insert_venta(venta):
-	conn = sqlite3.connect('data/ventas.db')
+	conn = sqlite3.connect('ventas.db')
 	c = conn.cursor()
 	#Cuando se usa una columna con autoincremento, hay que especificar los campos despues del nombre de la tabla
 	c.execute("INSERT INTO ventas(marca, plataforma, cantidad, valor, fecha) VALUES(:marca, :plat, :cant, :val, :fecha)",
@@ -29,7 +31,7 @@ def insert_venta(venta):
 
 
 def get_all_ventas():
-	conn = sqlite3.connect('data/ventas.db')
+	conn = sqlite3.connect('ventas.db')
 	c = conn.cursor()
 	c.execute("SELECT * FROM ventas ORDER BY -venta_id")
 	all_ = c.fetchall()
@@ -38,7 +40,7 @@ def get_all_ventas():
 
 
 def delete_venta(v_id):
-	conn = sqlite3.connect('data/ventas.db')
+	conn = sqlite3.connect('ventas.db')
 	c = conn.cursor()
 	c.execute("DELETE FROM ventas WHERE venta_id=:venta_id", {'venta_id':v_id})
 	conn.commit()

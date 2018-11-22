@@ -123,7 +123,9 @@ class Window(QWidget):
 			#row_count = self.tabla.rowCount() + 1
 			self.tabla.setRowCount(row_count)
 			for index2, attr in enumerate(row):
-				self.tabla.setItem(index,index2,QTableWidgetItem(str(attr)))
+				qtwi = QTableWidgetItem()
+				qtwi.setData(Qt.EditRole, QVariant(attr))
+				self.tabla.setItem(index,index2, qtwi)
 			row_count += 1
 
 	
@@ -218,7 +220,9 @@ class Window(QWidget):
 
 		for index, row in enumerate(get_all_ventas()):
 			for index2, attr in enumerate(row):
-				self.tabla.setItem(index,index2,QTableWidgetItem(str(attr)))
+				qtwi = QTableWidgetItem()
+				qtwi.setData(Qt.EditRole, QVariant(attr))
+				self.tabla.setItem(index,index2, qtwi)
 
 
 	def date_error(self):

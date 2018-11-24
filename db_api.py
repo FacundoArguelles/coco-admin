@@ -1,4 +1,5 @@
 import sqlite3
+import pprint
 from Venta_class import Venta
 
 
@@ -36,7 +37,11 @@ def get_all_ventas():
 	c.execute("SELECT * FROM ventas ORDER BY -venta_id")
 	all_ = c.fetchall()
 	conn.close()
-	return all_
+	pprint.pprint(f'ALL_: {all_}')
+	if not all_:
+		return False
+	else:
+		return all_
 
 
 def delete_venta(v_id):
@@ -45,6 +50,8 @@ def delete_venta(v_id):
 	c.execute("DELETE FROM ventas WHERE venta_id=:venta_id", {'venta_id':v_id})
 	conn.commit()
 	conn.close()
+
+
 
 
 # def update_venta(v_id):

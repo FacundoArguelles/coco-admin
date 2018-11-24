@@ -91,45 +91,43 @@ class Window(QWidget):
 		self.anio.setStyleSheet('background-color: #ffffff; ')
 		
 		
-		# QUE LA ULTIMA ENTRADA CREADA APAREZCA PRIMERA EN LA TABLA, NO ULTIMA
-		
 		#TABLE
 		self.tabla = QTableWidget()
 		self.tabla.setColumnCount(6)
-		self.tabla.setRowCount(1)
+		self.tabla.setRowCount(0)
 		self.tabla.setShowGrid(True)
 		self.tabla.setHorizontalHeaderLabels(('Venta','Marca','Plataforma','Cantidad','Valor','Fecha'))
 		self.tabla.setStyleSheet('background-color:#d6f9ff; border-radius: 20px; border: 2px solid gray;')
-		#self.tabla.horizontalHeader().setStyleSheet('background-color:#d6f9ff; border-radius: 30px; border: 2px solid gray;')
 		self.tabla.horizontalHeader().setSectionResizeMode(0, QHeaderView.ResizeToContents)
 		self.tabla.horizontalHeader().setSectionResizeMode(1, QHeaderView.Stretch)
 		self.tabla.horizontalHeader().setSectionResizeMode(2, QHeaderView.Stretch)
 		self.tabla.horizontalHeader().setSectionResizeMode(3, QHeaderView.ResizeToContents)
 		self.tabla.horizontalHeader().setSectionResizeMode(4, QHeaderView.ResizeToContents)
 		self.tabla.horizontalHeader().setSectionResizeMode(5, QHeaderView.ResizeToContents)
-		#self.tabla.verticalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
-		#self.tabla.horizontalHeaderItem(0).setStyleSheet('border-radius: 30')
 		self.tabla.setSelectionMode(QAbstractItemView.SingleSelection)
 		self.tabla.setEditTriggers(self.tabla.NoEditTriggers)
 		self.tabla.setSortingEnabled(True)
 		self.tabla.verticalHeader().hide()
-		'''ya se... no ordena bien el contenido de las columnas, porque los numeros que aparecen
-		en realidad son strings.. porque los tengo que convertir porque si no no los muestra'''
 		layout.addWidget(self.tabla,2,0,1,10)
 
 		check_table()
-		row_count = 1
-		for index, row in enumerate(get_all_ventas()):
-			#row_count = self.tabla.rowCount() + 1
-			self.tabla.setRowCount(row_count)
-			for index2, attr in enumerate(row):
-				qtwi = QTableWidgetItem()
-				qtwi.setData(Qt.EditRole, QVariant(attr))
-				self.tabla.setItem(index,index2, qtwi)
-			row_count += 1
+		row_count = 0
+		ventas = get_all_ventas()
+
+		if not ventas:
+			return
+		else:
+			for index, row in enumerate(ventas):
+				row_count += 1
+				self.tabla.setRowCount(row_count)
+
+				for index2, attr in enumerate(row):			
+					qtwi = QTableWidgetItem()
+					qtwi.setData(Qt.EditRole, QVariant(attr))
+					self.tabla.setItem(index,index2, qtwi)
+								
 
 	
-	#FALTA ESTILO VISUAL
 	def show_stats(self, marcas, plat, cant, gasto):
 		"""crea ventana para mostrar estadisticas"""
 		d = QDialog()
@@ -218,11 +216,17 @@ class Window(QWidget):
 			row_count = self.tabla.rowCount() - 1
 			self.tabla.setRowCount(row_count)
 
-		for index, row in enumerate(get_all_ventas()):
-			for index2, attr in enumerate(row):
-				qtwi = QTableWidgetItem()
-				qtwi.setData(Qt.EditRole, QVariant(attr))
-				self.tabla.setItem(index,index2, qtwi)
+		#row_count = 0
+		ventas = get_all_ventas()
+		if not ventas:
+			return
+		else:
+			for index, row in enumerate(ventas):
+				#self.tabla.setRowCount(row_count +1)
+				for index2, attr in enumerate(row):
+					qtwi = QTableWidgetItem()
+					qtwi.setData(Qt.EditRole, QVariant(attr))
+					self.tabla.setItem(index,index2, qtwi)
 
 
 	def date_error(self):
@@ -292,6 +296,9 @@ class Window(QWidget):
 	def delete(self):
 		row = self.tabla.currentItem().row()
 		item = self.tabla.item(row, 0).text()
+		print(int(row))
+		print(str(item))
+
 		delete_venta(item)
 		self.actualizar(signal=False)
 

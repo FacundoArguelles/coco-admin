@@ -5,3 +5,5 @@
 /icon.png
 /__pycache__
 /ventas.db
+/.exe
+/sqlite3.exe
